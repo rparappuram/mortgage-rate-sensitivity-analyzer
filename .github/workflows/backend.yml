@@ -1,0 +1,59 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths: [backend/**]
+  pull_request:
+    branches: [main]
+    paths: [backend/**]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Import check
+        run: python -c "from main import app; print('app OK')"
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build and push Docker image
+        uses: azure/docker-login@v2
+        with:
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/mrsa-backend:${{ github.sha }} .
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/mrsa-backend:${{ github.sha }}
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          images: ${{ secrets.ACR_LOGIN_SERVER }}/mrsa-backend:${{ github.sha }}
