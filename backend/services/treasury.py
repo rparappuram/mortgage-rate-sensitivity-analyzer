@@ -24,6 +24,7 @@ TENOR_FIELDS = {
 }
 
 NS = "http://schemas.microsoft.com/ado/2007/08/dataservices"
+NS_M = "http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"
 
 
 async def fetch_month(yyyymm: str) -> list[dict]:
@@ -37,7 +38,7 @@ async def fetch_month(yyyymm: str) -> list[dict]:
 def _parse_xml(xml_text: str) -> list[dict]:
     root = ET.fromstring(xml_text)
     entries = []
-    for props in root.iter(f"{{{NS}}}properties"):
+    for props in root.iter(f"{{{NS_M}}}properties"):
         row: dict = {}
         date_el = props.find(f"{{{NS}}}NEW_DATE")
         if date_el is None or not date_el.text:
