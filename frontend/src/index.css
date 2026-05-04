@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-mono: 'DM Mono', ui-monospace, monospace;
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', ui-serif, Georgia, serif;
+
+  --color-bg: #09090b;
+  --color-surface: #111113;
+  --color-surface2: #18181b;
+  --color-surface3: #27272a;
+  --color-text: #fafafa;
+  --color-muted: #a1a1aa;
+  --color-faint: #71717a;
+  --color-accent: #5b9cf6;
+  --color-accent-dim: rgba(91, 156, 246, 0.08);
+  --color-green: #3ecf8e;
+  --color-green-dim: rgba(62, 207, 142, 0.08);
+  --color-red: #f06060;
+  --color-red-dim: rgba(240, 96, 96, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 13px;
+}
+
+input[type='range'] {
+  accent-color: var(--color-accent);
+}
+
+input[type='date'] {
+  color-scheme: dark;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface3);
+  border-radius: 2px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
