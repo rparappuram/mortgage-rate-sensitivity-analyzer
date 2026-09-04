@@ -1,0 +1,32 @@
+[project]
+name = "mrsa-api"
+version = "2.0.0"
+description = "Mortgage Rate Sensitivity Analyzer API"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115",
+  "gunicorn>=23.0",
+  "httpx>=0.28",
+  "numpy>=2.0",
+  "pydantic>=2.10",
+  "pydantic-settings>=2.7",
+  "uvicorn[standard]>=0.34",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3",
+  "pytest-asyncio>=0.25",
+  "ruff>=0.9",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "N"]

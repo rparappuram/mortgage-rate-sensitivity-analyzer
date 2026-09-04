@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: mrsa-api
+Version: 2.0.0
+Summary: Mortgage Rate Sensitivity Analyzer API
+Requires-Python: >=3.12
+Requires-Dist: fastapi>=0.115
+Requires-Dist: gunicorn>=23.0
+Requires-Dist: httpx>=0.28
+Requires-Dist: numpy>=2.0
+Requires-Dist: pydantic>=2.10
+Requires-Dist: pydantic-settings>=2.7
+Requires-Dist: uvicorn[standard]>=0.34

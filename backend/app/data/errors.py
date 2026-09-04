@@ -1,0 +1,2 @@
+class MarketDataUnavailableError(RuntimeError):
+    pass

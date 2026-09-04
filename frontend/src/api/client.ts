@@ -1,45 +1,45 @@
-import type {
-  CurveTableResponse,
-  PositionRequest,
-  PositionResponse,
-  RateCurveResponse,
-} from '../types/api';
+import type { AnalysisRequest, AnalysisResponse, MarketResponse } from './types'
 
-const BASE = import.meta.env.VITE_API_BASE_URL ?? '';
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
 
-async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`);
-  if (!res.ok) {
-    const body = await res.text().catch(() => res.statusText);
-    throw new Error(`GET ${path} → ${res.status}: ${body}`);
+export class ApiError extends Error {
+  readonly status: number
+
+  constructor(status: number, message: string) {
+    super(message)
+    this.name = 'ApiError'
+    this.status = status
   }
-  return res.json() as Promise<T>;
 }
 
-async function post<T>(path: string, body: unknown): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const text = await res.text().catch(() => res.statusText);
-    throw new Error(`POST ${path} → ${res.status}: ${text}`);
+async function readErrorDetail(response: Response): Promise<string> {
+  try {
+    const body = (await response.json()) as { detail?: unknown }
+    if (typeof body.detail === 'string') return body.detail
+    if (Array.isArray(body.detail)) {
+      return body.detail
+        .map((item: { msg?: string; loc?: unknown[] }) => `${(item.loc ?? []).slice(1).join('.')}: ${item.msg ?? ''}`)
+        .join('; ')
+    }
+  } catch {
+    return response.statusText
   }
-  return res.json() as Promise<T>;
+  return response.statusText
+}
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...init,
+    headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
+  })
+  if (!response.ok) {
+    throw new ApiError(response.status, await readErrorDetail(response))
+  }
+  return (await response.json()) as T
 }
 
 export const api = {
-  getLiveRates: () => get<RateCurveResponse>('/api/rates/live'),
-
-  getHistoricalRates: (date: string) =>
-    get<RateCurveResponse>(`/api/rates/historical?date=${encodeURIComponent(date)}`),
-
-  getCurveTable: (date?: string) =>
-    get<CurveTableResponse>(
-      date ? `/api/rates/curve?date=${encodeURIComponent(date)}` : '/api/rates/curve',
-    ),
-
-  analyzePosition: (req: PositionRequest) =>
-    post<PositionResponse>('/api/position/analyze', req),
-};
+  market: () => request<MarketResponse>('/api/market'),
+  analyze: (body: AnalysisRequest) =>
+    request<AnalysisResponse>('/api/analyze', { method: 'POST', body: JSON.stringify(body) }),
+}
