@@ -67,9 +67,9 @@ export function Methodology() {
       title="How the numbers are made."
       description="Every figure on this page comes from the calculations described here, run on the server against public data. No proprietary models, no black boxes."
     >
-      <div className="grid gap-x-10 gap-y-8 md:grid-cols-2">
+      <div className="md:columns-2 md:gap-x-10">
         {topics.map((topic) => (
-          <article key={topic.title} className="space-y-2.5">
+          <article key={topic.title} className="mb-8 break-inside-avoid space-y-2.5">
             <h3 className="font-mono text-[11px] uppercase tracking-[0.14em] text-accent">{topic.title}</h3>
             {topic.body.map((paragraph) => (
               <p key={paragraph.slice(0, 32)} className="text-sm leading-relaxed text-muted">
